@@ -1,0 +1,6 @@
+{{ if eq .Values.namespacecreate "true" }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespace }}
+{{ end }}

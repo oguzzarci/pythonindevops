@@ -1,0 +1,31 @@
+namespacecreate: "false"
+namespace: ""
+replicas: 1
+deployment:
+  name: ""
+  image:
+    repository: ""
+    name: ""
+    tag: ""
+hpa:
+  min: 4
+  max: 50
+  averageUtilization: 50
+service:
+  port: 80
+  targetPort: 3000
+containers:
+  port: 3000
+resources:
+  cpu: 100m
+  memory: 125m
+ingress:
+  class: nginx
+  domain: dev.teknodice.com
+  active: false
+mysqlconfig:
+  MYSQL_USERNAME: root
+  MYSQL_PASSWORD_SECRET_KEY: mysql-root-password
+  MYSQL_INSTANCE_NAME: my_database
+  MYSQL_PORT_3306_TCP_ADDR: mysql.default.svc.cluster.local
+  MYSQL_PORT_3306_TCP_PORT: 3306

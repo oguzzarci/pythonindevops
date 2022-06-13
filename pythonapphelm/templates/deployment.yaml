@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.deployment.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deployment.name }}
+    spec:
+      containers:
+        - name: {{ .Values.deployment.name }}
+          image: {{ .Values.deployment.image.repository }}/{{ .Values.deployment.image.name }}:{{ .Values.deployment.image.tag }}
+          ports:
+            - containerPort: {{ .Values.containers.port }}
+          env:
+            - name: MYSQL_USERNAME
+              value: {{ .Values.mysqlconfig.MYSQL_USERNAME }}
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql
+                  key: {{ .Values.mysqlconfig.MYSQL_PASSWORD_SECRET_KEY }}
+            - name: MYSQL_INSTANCE_NAME
+              value: {{ .Values.mysqlconfig.MYSQL_INSTANCE_NAME }}
+            - name: MYSQL_PORT_3306_TCP_ADDR
+              value: {{ .Values.mysqlconfig.MYSQL_PORT_3306_TCP_ADDR }}
+            - name: MYSQL_PORT_3306_TCP_PORT
+              value: {{ .Values.mysqlconfig.MYSQL_PORT_3306_TCP_PORT}}
+          resources:
+            limits:
+              cpu: {{ .Values.resources.cpu }}
+              memory: {{ .Values.resources.memory }}
+            requests:
+              cpu: {{ .Values.resources.cpu }}
+              memory: {{ .Values.resources.memory }}
