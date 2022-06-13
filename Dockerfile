@@ -8,4 +8,6 @@ COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 RUN apk del build-deps
 COPY . .
-CMD ["python", "app.py"]
+#CMD ["python", "app.py"]
+RUN chmod +x ./entrypoint.sh
+ENTRYPOINT ["./entrypoint.sh"]
