@@ -4,3 +4,5 @@
 *.tfstate
 *.backup
 *.pem
+.DS_Store
+inventory

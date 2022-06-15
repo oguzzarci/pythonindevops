@@ -72,6 +72,12 @@
        chdir: $HOME
        creates: flannel_setup.log
 
+   - name: Setup StorageClass
+     shell: kubectl apply -f https://gist.githubusercontent.com/oguzzarci/7c22f218171e59e3529f9a04208a7d10/raw/28976bcb28c46ac6208ddd3b6f51988b5b7579bd/storageclass.yaml >> storage_class.log
+     args:
+       chdir: $HOME
+       creates: storage_class.log
+
    - name: Create token to join cluster
      shell: kubeadm token create --print-join-command
      register: join_command_raw
@@ -83,7 +89,8 @@
    - name: Copy KubeConfig to Local
      fetch:
        src: /etc/kubernetes/admin.conf
-       dest: ./config
+       dest: ./
+       flat: yes
 
 # Join Cluster with each kube-node
 - hosts: Worker_Node
