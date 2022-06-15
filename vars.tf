@@ -9,3 +9,8 @@ variable "instance_type" {
     type = string
     default = "t3.medium"
 }
+
+variable "ecr_name" {
+   type = string
+   default = "pythonappregistry"
+}

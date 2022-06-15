@@ -103,6 +103,7 @@ AWS'de Master ve Worker sunucularımızı terraform ile yapıyoruz. Terraform il
 - EC2
 - Security Group
 - PEM file
+- ECR
 
 ### provider.tf 
 Aws'de kullanacağım region ve profilimi belirtiyorum. Profileriniz görmek için ```cat /Users/oguz/.aws/credentials ``` diyerek görebilirsiniz. Burada ki komutu kendinize göre düzenlemeniz gerek.
@@ -114,7 +115,7 @@ Aws'de kullanacağım region ve profilimi belirtiyorum. Profileriniz görmek iç
 ```
 
 ### vars.tf
-Terraform scriptlerimizde kullanacağımız değişkenleri burada tanımlıyoruz. Ben kullanacağım ami_id ve instance_type bilgilerini burada tuttum.
+Terraform scriptlerimizde kullanacağımız değişkenleri burada tanımlıyoruz. Ben kullanacağım ami_id, instance_type ve docker registry(ECR) bilgilerini burada tuttum.
 ```sh
 variable "aws_ami_id" {
     type = string
@@ -126,6 +127,47 @@ variable "aws_ami_id" {
 variable "instance_type" {
     type = string
     default = "t3.medium"
+}
+
+variable "ecr_name" {
+   type = string
+   default = "pythonappregistry"
+}
+
+```
+
+### ecr.tf
+Build adımında oluşturacağımız docker registry'i oluşturuyoruz.
+```sh
+resource "aws_ecr_repository" "pythonapp-repository" {
+  name                 = var.ecr_name
+  image_tag_mutability = "IMMUTABLE"
+}
+
+resource "aws_ecr_repository_policy" "demo-repo-policy" {
+  repository = aws_ecr_repository.pythonapp-repository.name
+  policy     = <<EOF
+  {
+    "Version": "2008-10-17",
+    "Statement": [
+      {
+        "Sid": "adds full ecr access to the python repository",
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:BatchGetImage",
+          "ecr:CompleteLayerUpload",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetLifecyclePolicy",
+          "ecr:InitiateLayerUpload",
+          "ecr:PutImage",
+          "ecr:UploadLayerPart"
+        ]
+      }
+    ]
+  }
+  EOF
 }
 ```
 
