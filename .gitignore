@@ -1,1 +1,6 @@
 .git
+.terraform
+*.state
+*.tfstate
+*.backup
+*.pem
