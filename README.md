@@ -526,3 +526,40 @@ Yukarıda oluşturduğumuz join_command'ı Worker Node'a kullanaracak kubernetes
 ![N|Solid](./images/terraformapply.png)
 
 ### ``` terraform apply --auto--approve :``` Bu komut ile tüm resource'lar oluşmaya başlayacaktır. Sizden onay beklemez ve tüm resource'lar oluşmaya başlar.
+---
+![N|Solid](./images/devops.png)
+
+> ```terraform apply```'dan sonra ```yes``` diyerek kurulumlara başlıyoruz.
+
+
+Aşağıdaki görüntüde terraform master ve worker node'ları oluşturdu. local-exec adıma geldi burada da ansible scriptimizi tetikleyecek.
+![N|Solid](./images/setup.png)
+
+```Ansible``` çalışarak node'lara gerekli kurulumları yapıyor.
+
+![N|Solid](./images/setup2.png)
+
+Kurulumlar tamamlandı ve output olarak tanımladığımız Master ve Worker node'larının public ip'leri döndü. Terraform toplamda 15 tane resource oluşturuğunu bilgisinide veriyor.
+
+![N|Solid](./images/setup3.png)
+
+# Oluşan Resource'lar
+>EC2
+![N|Solid](./images/nodes.png)
+
+>VPC
+![N|Solid](./images/vpc.png)
+
+
+>Subnet
+![N|Solid](./images/subnet.png)
+
+>Security Group
+![N|Solid](./images/sg.png)
+
+>Key pair
+![N|Solid](./images/key.png)
+
+>Amazon Elastic Container Registry (ECR)
+![N|Solid](./images/ecr.png)
+---
