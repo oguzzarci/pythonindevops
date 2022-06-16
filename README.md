@@ -31,11 +31,11 @@ RUN chmod +x ./entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]
 ```
 
-- ## requirements.txt
+- ## ``` requirements.txt ```
 
 Bu dosyada uygulamamızın ihtiyaç duyduğu paketleri alt alta yazıyor. pip3 komutu tek tek okuyup bizim için indiriyor.
 
-- ## Gunicorn
+- ## ``` Gunicorn ```
 Python ile yazılmış bir WSGI HTTP server. Dinamik içerik söz konusu olduğunda Apache’ye göre daha lightweight bir web server olduğu için performansı daha yüksek. Daha fazla detay için http://gunicorn.org/
 
 ----
@@ -105,7 +105,7 @@ AWS'de Master ve Worker sunucularımızı terraform ile yapıyoruz. Terraform il
 - PEM file
 - ECR
 
-### provider.tf 
+### ``` provider.tf ```
 Aws'de kullanacağım region ve profilimi belirtiyorum. Profileriniz görmek için ```cat /Users/oguz/.aws/credentials ``` diyerek görebilirsiniz. Burada ki komutu kendinize göre düzenlemeniz gerek.
 ```sh
   provider "aws" {
@@ -114,7 +114,7 @@ Aws'de kullanacağım region ve profilimi belirtiyorum. Profileriniz görmek iç
   }
 ```
 
-### vars.tf
+### ``` vars.tf ```
 Terraform scriptlerimizde kullanacağımız değişkenleri burada tanımlıyoruz. Ben kullanacağım ami_id, instance_type ve docker registry(ECR) bilgilerini burada tuttum.
 ```sh
 variable "aws_ami_id" {
@@ -136,7 +136,7 @@ variable "ecr_name" {
 
 ```
 
-### ecr.tf
+### ``` ecr.tf ```
 Build adımında oluşturacağımız docker registry'i oluşturuyoruz.
 ```sh
 resource "aws_ecr_repository" "pythonapp-repository" {
@@ -144,7 +144,7 @@ resource "aws_ecr_repository" "pythonapp-repository" {
   image_tag_mutability = "IMMUTABLE"
 }
 
-resource "aws_ecr_repository_policy" "demo-repo-policy" {
+resource "aws_ecr_repository_policy" "pythonapp-repository-policy" {
   repository = aws_ecr_repository.pythonapp-repository.name
   policy     = <<EOF
   {
@@ -171,7 +171,7 @@ resource "aws_ecr_repository_policy" "demo-repo-policy" {
 }
 ```
 
-### vpc.tf
+### ``` vpc.tf ```
 EC2'ların kullanacağı vpc'leri oluşturuyoruz. Hangi ip aralıklarında ip alacağı gibi bilgileri burada tanımlıyoruz.
 ```sh
 # Create VPC
@@ -221,7 +221,7 @@ resource "aws_route_table_association" "k8s_asso" {
 
 ```
 
-### securitygroup.tf
+### ``` securitygroup.tf ```
 EC2'ların giriş ve çıkış(igress/egress) kurallarını belirtiyoruz.
 ```sh
 # Create security group
@@ -255,7 +255,7 @@ resource "aws_security_group" "allow_ssh_http" {
   }
 }
 ```
-### sshkey.tf
+### ```sshkey.tf```
 EC2'lara ssh ile bağlanmamız için gerekli pem dosyasını oluşturuyoruz. Burada kullanacağı şifreleme algoritması gibi bilgilerini giriyoruz. Ansible'da bu pem dosyasını kullanacak.
 local_file diyerek oluşturduğumuz pem dosyasını root path'imize indiriyoruz.
 ```sh
@@ -278,7 +278,7 @@ resource "local_file" "keyfile" {
 }
 ```
 
-### masternode.tf
+### ``` masternode.tf ```
 Master olarak kullanacağımız EC2'nun kullanacağı ami,instance_type ve key_name gibi değişkenlerini tanımlıyoruz.
 ```sh
 # Launch EC2 instnace for Master Node
@@ -295,7 +295,7 @@ resource "aws_instance" "k8smaster" {
 }
 ```
 
-### workernode.tf
+### ``` workernode.tf ```
 Worker olarak kullanacağımız EC2'nun kullanacağı ami,instance_type ve key_name gibi değişkenlerini tanımlıyoruz.
 ```sh
 # Launch EC2 instnace for Worker Node
@@ -312,12 +312,12 @@ resource "aws_instance" "k8sworker" {
 }
 ```
 
-### ansible.tf
+### ``` ansible.tf ```
 Ansible'ın kullanacağı invertory yani sunucularımız ip'lerinin olduğu dosyayı burada oluşturuyoruz.
 Local-exec ile ansible scriptimizi tetikleyerek EC2'lara kubernetes kurulumu yapıyoruz.
 
 
-invertory
+``` invertory```
 ```sh
 [Master_Node]
 34.54.65.76
@@ -351,7 +351,7 @@ resource "null_resource" "null1" {
 ![N|Solid](./images/ansible.png)
 Terraform ile oluşturduğumuz EC2'lara gerekli kurulumları yapacak aracımız, Ansible. Tekrarlı işlemlerinizi 'n' tane sunucularında hızlıca yapabilirsiniz. Örnek olarak 100 tane ubuntu sunucu var. Bir güvenlik paketi güncellemesi yapacaksınız. Ansible ile tek bir script ile tüm sunucularınızda güvenlik paketinizi yükleyebilirsiniz.
 
-### ansible.cfg
+### ``` ansible.cfg ```
 Ansible'ın kullanacağı config'ini aşağıdaki gibi belirtiyoruz.
 private_key_file=terraform_key.pem, yukarıda terraform ile oluşturuduğumuz pem dosyasının adını burada belirtiyoruz.
 ```sh
@@ -370,7 +370,7 @@ become_method=sudo
 become_ask_pass=False
 ```
 
-ansibletasks.yaml
+###  ```ansibletasks.yaml ```
 Aşağıdaki adımları hem Master hemde Worker node'larda çalıştıracak. Çünkü aşağıdaki paketler ikisi içinde gerekli.
 ```yaml
 # Install required software
@@ -502,3 +502,27 @@ Yukarıda oluşturduğumuz join_command'ı Worker Node'a kullanaracak kubernetes
         chdir: $HOME
         creates: node
 ```
+
+# SETUP
+> Terraform scriptlerimizin olduğu yerde aşağıdaki komutları sırasıyla çalıştıracağız.
+- terraform init
+- terraform validate
+- terraform plan
+- terraform appy ve terraform apply --auto-approve
+
+### ``` terrraform init : ``` Scriptlerimizde kullandığımız modülleri indiriyor. Örnek olarak; npm install
+![N|Solid](./images/terraforminit.png)
+
+### ```  terraform validate :```  Yazdığımız scriptlerde herhangi bir hata olup olmadığını kontrol ediyoruz.
+
+![N|Solid](./images/terraformvalidate.png)
+
+### ``` terraform plan :``` Terraform'un bizim için neler oluşturacağını görüyoruz. Oluşturmadan önce kontrol edebiliyoruz.
+
+![N|Solid](./images/terraformplan.png)
+
+### ``` terraform apply :``` Bu komut ile tüm resource'lar oluşmaya başlayacaktır. Ama sizden bir onay isteyecektir. yes diyerek devam edebilirsiniz.
+
+![N|Solid](./images/terraformapply.png)
+
+### ``` terraform apply --auto--approve :``` Bu komut ile tüm resource'lar oluşmaya başlayacaktır. Sizden onay beklemez ve tüm resource'lar oluşmaya başlar.

@@ -3,7 +3,7 @@ resource "aws_ecr_repository" "pythonapp-repository" {
   image_tag_mutability = "IMMUTABLE"
 }
 
-resource "aws_ecr_repository_policy" "demo-repo-policy" {
+resource "aws_ecr_repository_policy" "pythonapp-repository-policy" {
   repository = aws_ecr_repository.pythonapp-repository.name
   policy     = <<EOF
   {
