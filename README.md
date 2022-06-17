@@ -2,17 +2,21 @@
 
 > Python web uygulamamızı deploy edeceğiz. Terraform ile AWS'de Master ve Worker olacak şekilde 2 tane EC2 ayağa kaldıracağız. Daha sonra bu EC2'lara ansible yardımı ile kubernetes'i kuracağız.
 
+<br /><br />
 ![N|Solid](./images/teranec2.png)
-
+<br /><br />
 # Gereksinimler
 - Terraform
 - Ansible
 - Aws Account
 - AwsCLI
 - Helm3
+<br /><br />
 ---
 ![N|Solid](./images/docker.png)
+<br /><br />
 ## Python Uygulamasının Dockerize Edilmesi
+
 ```docker
 FROM python:alpine3.15
 RUN mkdir /app
@@ -38,9 +42,12 @@ Bu dosyada uygulamamızın ihtiyaç duyduğu paketleri alt alta yazıyor. pip3 k
 - ## ``` Gunicorn ```
 Python ile yazılmış bir WSGI HTTP server. Dinamik içerik söz konusu olduğunda Apache’ye göre daha lightweight bir web server olduğu için performansı daha yüksek. Daha fazla detay için http://gunicorn.org/
 
+
 ----
 
 ### İlk build sırasında aşağıdaki hatayla karşılaştım. Bunu için Dockerfile'da değişiklik yapmam gerekti.
+
+<br /><br />
 
 ```diff
 - #9 4.532 Collecting mysqlclient                                                             
@@ -95,6 +102,7 @@ gunicorn app:application -w 4 --threads 2 -b 0.0.0.0:3000
 
 
 ![N|Solid](./images/terraform2.png)
+<br /><br />
 AWS'de Master ve Worker sunucularımızı terraform ile yapıyoruz. Terraform ile aşağıdaki resource'ları oluşturuyoruz.
 - Vpc
 - Subnet
@@ -104,6 +112,7 @@ AWS'de Master ve Worker sunucularımızı terraform ile yapıyoruz. Terraform il
 - Security Group
 - PEM file
 - ECR
+<br /><br />
 
 ### ``` provider.tf ```
 Aws'de kullanacağım region ve profilimi belirtiyorum. Profileriniz görmek için ```cat /Users/oguz/.aws/credentials ``` diyerek görebilirsiniz. Burada ki komutu kendinize göre düzenlemeniz gerek.
@@ -113,6 +122,7 @@ Aws'de kullanacağım region ve profilimi belirtiyorum. Profileriniz görmek iç
     profile = "terraform"
   }
 ```
+<br /><br />
 
 ### ``` vars.tf ```
 Terraform scriptlerimizde kullanacağımız değişkenleri burada tanımlıyoruz. Ben kullanacağım ami_id, instance_type ve docker registry(ECR) bilgilerini burada tuttum.
@@ -135,6 +145,8 @@ variable "ecr_name" {
 }
 
 ```
+
+<br /><br />
 
 ### ``` ecr.tf ```
 Build adımında oluşturacağımız docker registry'i oluşturuyoruz.
@@ -170,6 +182,8 @@ resource "aws_ecr_repository_policy" "pythonapp-repository-policy" {
   EOF
 }
 ```
+
+<br /><br />
 
 ### ``` vpc.tf ```
 EC2'ların kullanacağı vpc'leri oluşturuyoruz. Hangi ip aralıklarında ip alacağı gibi bilgileri burada tanımlıyoruz.
@@ -221,6 +235,8 @@ resource "aws_route_table_association" "k8s_asso" {
 
 ```
 
+<br /><br />
+
 ### ``` securitygroup.tf ```
 EC2'ların giriş ve çıkış(igress/egress) kurallarını belirtiyoruz.
 ```sh
@@ -255,6 +271,9 @@ resource "aws_security_group" "allow_ssh_http" {
   }
 }
 ```
+
+<br /><br />
+
 ### ```sshkey.tf```
 EC2'lara ssh ile bağlanmamız için gerekli pem dosyasını oluşturuyoruz. Burada kullanacağı şifreleme algoritması gibi bilgilerini giriyoruz. Ansible'da bu pem dosyasını kullanacak.
 local_file diyerek oluşturduğumuz pem dosyasını root path'imize indiriyoruz.
@@ -278,6 +297,8 @@ resource "local_file" "keyfile" {
 }
 ```
 
+<br /><br />
+
 ### ``` masternode.tf ```
 Master olarak kullanacağımız EC2'nun kullanacağı ami,instance_type ve key_name gibi değişkenlerini tanımlıyoruz.
 ```sh
@@ -295,6 +316,8 @@ resource "aws_instance" "k8smaster" {
 }
 ```
 
+<br /><br />
+
 ### ``` workernode.tf ```
 Worker olarak kullanacağımız EC2'nun kullanacağı ami,instance_type ve key_name gibi değişkenlerini tanımlıyoruz.
 ```sh
@@ -311,6 +334,8 @@ resource "aws_instance" "k8sworker" {
   }
 }
 ```
+
+<br /><br />
 
 ### ``` ansible.tf ```
 Ansible'ın kullanacağı invertory yani sunucularımız ip'lerinin olduğu dosyayı burada oluşturuyoruz.
@@ -346,13 +371,19 @@ resource "null_resource" "null1" {
     }
 }
 ```
----
+
+
+<br /><br />
 
 ![N|Solid](./images/ansible.png)
+
+
 
 Terraform ile oluşturduğumuz EC2'lara gerekli kurulumları yapacak aracımız, Ansible. Tekrarlı işlemlerinizi 'n' tane sunucularında hızlıca yapabilirsiniz. 
 
 Örnek olarak; 100 tane ubuntu sunucu var. Bir güvenlik paketi güncellemesi yapacaksınız. Ansible ile tek bir script ile tüm sunucularınızda güvenlik paketinizi yükleyebilirsiniz.
+
+<br /><br />
 
 ### ``` ansible.cfg ```
 Ansible'ın kullanacağı config'ini aşağıdaki gibi belirtiyoruz.
@@ -372,6 +403,8 @@ become_user=root
 become_method=sudo
 become_ask_pass=False
 ```
+
+<br /><br />
 
 ###  ```ansibletasks.yaml ```
 Aşağıdaki adımları hem Master hemde Worker node'larda çalıştıracak. Çünkü aşağıdaki paketler ikisi içinde gerekli.
@@ -411,6 +444,8 @@ Aşağıdaki adımları hem Master hemde Worker node'larda çalıştıracak. Ç�
        enabled: yes
 
 ```
+<br /><br />
+
 Master Node'a kubectl kuruyoruz
 ```yaml
 # Setup Cluster
@@ -422,6 +457,8 @@ Master Node'a kubectl kuruyoruz
        name: kubectl
        state: present
 ```
+<br /><br />
+
 kubeadm ile kubernetes'i başlatıyoruz.
 ```yaml
    # Initialize Cluster. The log is also used to prevent an second initialization
@@ -431,6 +468,8 @@ kubeadm ile kubernetes'i başlatıyoruz.
        chdir: $HOME
        creates: cluster_init.log
 ```
+<br /><br />
+
 kubectl komutunu çalıştırdığımızda default olarak $HOME/.kube/config doyasına bakar. Aşağıda $HOME/.kube dosyasını oluşturuyoruz. Bir sonraki adımda config dosyamızı buraya kopyalacağız.
 ```yaml
    # Create the configuration / configuration directory
@@ -440,6 +479,8 @@ kubectl komutunu çalıştırdığımızda default olarak $HOME/.kube/config doy
        state: directory
        mode: 0755
 ```
+<br /><br />
+
 /etc/kubernetes/admin.conf path'inde oluşan admin.conf dosyasını yukarıda oluşturduğumuz path'e config olarak kopyalıyoruz.
 ```yaml
    - name: Copy admin.conf to the user's kube directory
@@ -448,6 +489,8 @@ kubectl komutunu çalıştırdığımızda default olarak $HOME/.kube/config doy
        dest: $HOME/.kube/config
        remote_src: yes
 ```
+<br /><br />
+
 Kubernetes container'larının arasındaki network'ü sağlayacak olan flannel'ı kuruyoruz.
 ```yaml
    - name: Setup Flannel. Use log to prevent second installation
@@ -456,6 +499,8 @@ Kubernetes container'larının arasındaki network'ü sağlayacak olan flannel'�
        chdir: $HOME
        creates: flannel_setup.log
 ```
+<br /><br />
+
 Uygulamalarımızda persistence volume kullanabilmek için AWS EBS storageclass kurulumu yapıyoruz.
 ```yaml
    - name: Setup StorageClass
@@ -464,6 +509,8 @@ Uygulamalarımızda persistence volume kullanabilmek için AWS EBS storageclass 
        chdir: $HOME
        creates: storage_class.log
 ```
+<br /><br />
+
 Worker olacak sunucuyu cluster'a join edecek komutu oluşturuyoruz. join_commad değişkenine atıyoruz.
 ```yaml
    - name: Create token to join cluster
@@ -474,6 +521,8 @@ Worker olacak sunucuyu cluster'a join edecek komutu oluşturuyoruz. join_commad 
      set_fact:
        join_command: "{{ join_command_raw.stdout_lines[0] }}"
 ```
+<br /><br />
+
 Local bilgisayarımızdan bağlanabilmek için admin.conf dosyasını kopyalıyoruz.
 ```yaml
    - name: Copy KubeConfig to Local
@@ -482,6 +531,8 @@ Local bilgisayarımızdan bağlanabilmek için admin.conf dosyasını kopyalıyo
        dest: ./
        flat: yes
 ```
+<br /><br />
+
 Yukarıda oluşturduğumuz join_command'ı Worker Node'a kullanaracak kubernetes cluster'ına worker olarak ekliyoruz.
 ```yaml
 # Join Cluster with each kube-node
@@ -506,6 +557,8 @@ Yukarıda oluşturduğumuz join_command'ı Worker Node'a kullanaracak kubernetes
         creates: node
 ```
 
+<br /><br />
+
 # SETUP
 > Terraform scriptlerimizin olduğu yerde aşağıdaki komutları sırasıyla çalıştıracağız.
 - terraform init
@@ -513,38 +566,84 @@ Yukarıda oluşturduğumuz join_command'ı Worker Node'a kullanaracak kubernetes
 - terraform plan
 - terraform appy ve terraform apply --auto-approve
 
+<br /><br />
+
 ### ``` terrraform init : ``` Scriptlerimizde kullandığımız modülleri indiriyor. Örnek olarak; npm install
 ![N|Solid](./images/terraforminit.png)
+
+<br /><br />
 
 ### ```  terraform validate :```  Yazdığımız scriptlerde herhangi bir hata olup olmadığını kontrol ediyoruz.
 
 ![N|Solid](./images/terraformvalidate.png)
 
+<br /><br />
+
 ### ``` terraform plan :``` Terraform'un bizim için neler oluşturacağını görüyoruz. Oluşturmadan önce kontrol edebiliyoruz.
 
 ![N|Solid](./images/terraformplan.png)
+
+<br /><br />
 
 ### ``` terraform apply :``` Bu komut ile tüm resource'lar oluşmaya başlayacaktır. Ama sizden bir onay isteyecektir. yes diyerek devam edebilirsiniz.
 
 ![N|Solid](./images/terraformapply.png)
 
+<br /><br />
+
 ### ``` terraform apply --auto--approve :``` Bu komut ile tüm resource'lar oluşmaya başlayacaktır. Sizden onay beklemez ve tüm resource'lar oluşmaya başlar.
 ---
 ![N|Solid](./images/devops.png)
 
+<br /><br />
+
 > ```terraform apply```'dan sonra ```yes``` diyerek kurulumlara başlıyoruz.
+
 
 
 Aşağıdaki görüntüde terraform master ve worker node'ları oluşturdu. local-exec adıma geldi burada da ansible scriptimizi tetikleyecek.
 ![N|Solid](./images/setup.png)
 
+<br /><br />
+
 ```Ansible``` çalışarak node'lara gerekli kurulumları yapıyor.
 
 ![N|Solid](./images/setup2.png)
 
+<br /><br />
+
 Kurulumlar tamamlandı ve output olarak tanımladığımız Master ve Worker node'larının public ip'leri döndü. Terraform toplamda 15 tane resource oluşturuğunu bilgisinide veriyor.
 
 ![N|Solid](./images/setup3.png)
+
+<br /><br />
+
+---
+
+![N|Solid](./images/k8s.png)
+
+<br /><br />
+
+# SSH MASTER NODE
+
+Terraform output olarak bize Master ve Worker node'ların public ip'leri veriyor. Oluşturduğumuz .pem dosyası ile bu sunuculara kolaylıkla ssh ile bağlanabiliriz.
+
+Aşağıdaki ssh komutu ile sunucuya bağlanalım.
+<br /><br />
+```sh
+ssh -i terraform_key.pem ubuntu@PUBLIC_IP
+```
+<br /><br />
+![N|Solid](./images/ssh.png)
+<br /><br />
+Kurulumları root kullanıcı ile yaptığımız için ilk olarak root kullanıcına geçmemiz gerekiyor. Daha sonra ```kubectl get nodes``` diyerek kontrollerimizi gerçekleştiriyoruz.
+<br /><br />
+
+![N|Solid](./images/ssh2.png)
+<br /><br />
+Kubernetes kurulumumuz sorunsuz bir şekilde tamamlanmış.
+
+<br /><br />
 
 # Oluşan Resource'lar
 >EC2
@@ -567,10 +666,13 @@ Kurulumlar tamamlandı ve output olarak tanımladığımız Master ve Worker nod
 ![N|Solid](./images/ecr.png)
 
 ---
+<br /><br />
 
-# AZURE DEVOPS İLE CD/CD
+# AZURE DEVOPS İLE CI/CD
 ### Gereksinimler
 - Microsof Hesabı(adiniz@hotmail.com vs)
+
+<br /><br />
 
 ## ```Build Pipeline```
 
@@ -583,12 +685,16 @@ Kurulumlar tamamlandı ve output olarak tanımladığımız Master ve Worker nod
 - ECR Push
 
 ---
+
+<br /><br />
 ```AzureDevOps'da proje açılması```
 > Sol üstte New project butonuna tıkladıktan sonra proje ismini belirleyip oluşturuyoruz. 
 
 ![N|Solid](./images/createnewproject.png)
 
 ![N|Solid](./images/newproject.png)
+
+<br /><br />
 
 ```Aws için service connection girilmesi```
 > Oluşturduğumuz projeye tıkladıktan sonra sol alttan Project settings daha sonra Service connection'u seçiyoruz.
@@ -616,6 +722,8 @@ Eklemek istediğimiz organizasyonu seçecerek ``ìnstall`` diyerek devam ediyoru
 
 ![N|Solid](./images/ipg.png)
 
+<br /><br />
+
 > Service connection ekranına tekrar geldiğinizde AWS seçeneğinin geldiğini göreceksiniz.
 
 ![N|Solid](./images/scaws.png)
@@ -625,6 +733,8 @@ Next diyerek ilerlediğimizde sizden ```Access Key ID```, ```Secret Access Key``
 AWS IAM üzerinden ECR'da full yetkili bir kullanıcı oluşturduktan sonra bu kullanıcının bilgilerini kullanabilirsiniz. 
 
 ![N|Solid](./images/ecrok.png)
+
+<br /><br />
 
 ```Docker Build```
 > Proje sayfasında sol sekmede bulunan Pipelines kısmından Create Pipeline diyerek yeni bir pipeline oluşturuyoruz.
@@ -665,3 +775,4 @@ Build başarılı bir şekilde çalıştı ve ECR'a pushladık.
 > Kodumuza her push çıktığımızda build almasını istiyorsak aşağıdaki gibi ```trigger```'ı açmamız gerekiyor.
 
 ![N|Solid](./images/pipeline12.png)
+
