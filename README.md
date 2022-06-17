@@ -624,6 +624,27 @@ Kurulumlar tamamlandı ve output olarak tanımladığımız Master ve Worker nod
 
 <br /><br />
 
+## AWS Storage Class
+> Deploy ettiğimiz uygumaların bazıları persistence dataya ihtiyaç duyabilirler. Uygulama pod'u silindiğinde yada yeniden açıldığında kalıcı datalarını kaybetmemesi için bunu kullanıyoruz. 
+Örnek olarak; MySQL,Redis,MongoDB vs.
+
+<br/><br />
+Aşağıdaki yaml ile oluşturduğumuz cluster'a storageclass ekliyoruz.
+```yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: gp2
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+  fsType: ext4
+```
+
+<br/><br />
+
 # SSH MASTER NODE
 
 Terraform output olarak bize Master ve Worker node'ların public ip'leri veriyor. Oluşturduğumuz .pem dosyası ile bu sunuculara kolaylıkla ssh ile bağlanabiliriz.
@@ -776,3 +797,24 @@ Build başarılı bir şekilde çalıştı ve ECR'a pushladık.
 
 ![N|Solid](./images/pipeline12.png)
 
+<br /><br />
+
+# Deploying MySQL on Kubernetes
+![N|Solid](./images/mysql.png)
+
+Mysql kurulumlarını genel olarak [Bitnami'nin helm paketini](https://bitnami.com/stack/mysql/helm) kullanıyorum. Kurulumu oldukça kolay.
+
+### Gereksinimler
+- Helm
+- Kubectl
+- Kubernetes Cluster
+
+Aşağıdaki adımları takip ederek kurulumu yapalım. Burada iki tane mysql kuracağız. Hem dev hemde prod namespace'lerine.
+
+```sh
+helm repo add bitnami https://charts.bitnami.com/bitnami
+```
+
+```sh
+helm install devmysql bitnami/mysql --set metrics.enabled=true --set namespaceOverride=dev
+```
