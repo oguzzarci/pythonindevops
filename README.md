@@ -334,8 +334,132 @@ resource "aws_instance" "k8sworker" {
   }
 }
 ```
+<br /><br/>
 
+### ```masterrole.tf```
+Master sunucumuza aws servislerini kullanabilmesi için gerekli yetlileri tanımlıyoruz.
+```sh
+resource "aws_iam_role" "master_role" {
+  name = "master_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+
+  tags = {
+      role = "master"
+  }
+}
+
+resource "aws_iam_instance_profile" "master_profile" {
+  name = "master_profile"
+  role = "${aws_iam_role.master_role.name}"
+}
+
+resource "aws_iam_role_policy" "master_policy" {
+  name = "master_policy"
+  role = "${aws_iam_role.master_role.id}"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:*",
+                "elasticloadbalancing:*",
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:GetRepositoryPolicy",
+                "ecr:DescribeRepositories",
+                "ecr:ListImages",
+                "ecr:BatchGetImage"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+```
 <br /><br />
+
+### ```workerrole.tf```
+Worker sunucumuza aws servislerini kullanabilmesi için gerekli yetlileri tanımlıyoruz.
+```sh
+resource "aws_iam_role" "worker_role" {
+  name = "worker_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+
+  tags = {
+      role = "worker"
+  }
+}
+
+resource "aws_iam_instance_profile" "worker_profile" {
+  name = "worker_profile"
+  role = "${aws_iam_role.worker_role.name}"
+}
+
+resource "aws_iam_role_policy" "worker_policy" {
+  name = "worker_policy"
+  role = "${aws_iam_role.worker_role.id}"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:Describe*",
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:GetRepositoryPolicy",
+                "ecr:DescribeRepositories",
+                "ecr:ListImages",
+                "ecr:BatchGetImage"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+```
+
+
+<br /><br/>
 
 ### ``` ansible.tf ```
 Ansible'ın kullanacağı invertory yani sunucularımız ip'lerinin olduğu dosyayı burada oluşturuyoruz.
