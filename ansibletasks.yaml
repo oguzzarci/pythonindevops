@@ -75,6 +75,12 @@
        chdir: $HOME
        creates: storage_class.log
 
+   - name: To deploy the CSI driver
+     shell: kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.6" >> csi.log
+     args:
+       chdir: $HOME
+       creates: csi.log
+
    - name: Create token to join cluster
      shell: kubeadm token create --print-join-command
      register: join_command_raw
