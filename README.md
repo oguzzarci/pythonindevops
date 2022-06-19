@@ -923,7 +923,19 @@ Build başarılı bir şekilde çalıştı ve ECR'a pushladık.
 
 <br /><br />
 
+![N|Solid](./images/sonarcloud.png)
+### ```Sonar Cloud Entegrasyonu```
 
+>[SonarCloud](https://sonarcloud.io/)'ta hesap oluşturduktan sonra proje oluşturuyoruz.
+
+
+>Aşağıdaki gibi sonarcloud projemizi pipeline'a nasıl ekleyeceğimizi gösteriyor. Gösterdiği komutları bir bash scripti olarak pipeline'a ekliyoruz.
+
+![N|Solid](./images/sonar.png)
+
+![N|Solid](./images/sonar2.png)
+
+![N|Solid](./images/sonar3.png)
 
 # Deploying MySQL on Kubernetes
 ![N|Solid](./images/mysql.png)
