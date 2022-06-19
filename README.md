@@ -1033,7 +1033,16 @@ helm install pythonapprod ./pythonapphelm --set namespace=prod --set deployment.
 
 ![N|Solid](./images/k8ssc.png)
 
-> admin.conf dosyamızının içeriğini aşağıdaki gibi kopyalayıp ve Service connection name vererek kaydedelim.
+> admin.conf dosyamızının içeriğini aşağıdaki gibi kopyalayıp ve Service connection name vererek kaydedelim. Burada server master sunucumuzun private ip'si olacaktır. Onu putput'ta gelen master sunucumuzun public ip'si ile değiştirelim.
+
+<br/>
+
+### ```NOT :``` Local bilgisayarınızda bu config dosyası ile işlem yaptığınız da Certificate hatası alırsanız aşağıdaki komutu çalıştırarak bu hatayı ignore edebilirsiniz.
+```sh
+kubectl config set-cluster kubernetes --insecure-skip-tls-verify=true
+```
+
+<br/>
 
 ![N|Solid](./images/k8sscok.png)
 
