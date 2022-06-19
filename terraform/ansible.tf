@@ -14,7 +14,8 @@ resource "null_resource" "null1" {
   provisioner "local-exec" {
     command = "sleep 60"
     }
+
   provisioner "local-exec" {
-    command = "ansible-playbook ansibletasks.yaml"
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory -u ubuntu --private-key ./terraform_key.pem ../ansible/ansibletasks.yaml"
     }
 }
