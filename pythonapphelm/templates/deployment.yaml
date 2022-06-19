@@ -19,19 +19,19 @@ spec:
           ports:
             - containerPort: {{ .Values.containers.port }}
           env:
-            - name: MYSQL_USERNAME
-              value: {{ .Values.mysqlconfig.MYSQL_USERNAME }}
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql
-                  key: {{ .Values.mysqlconfig.MYSQL_PASSWORD_SECRET_KEY }}
-            - name: MYSQL_INSTANCE_NAME
-              value: {{ .Values.mysqlconfig.MYSQL_INSTANCE_NAME }}
-            - name: MYSQL_PORT_3306_TCP_ADDR
-              value: {{ .Values.mysqlconfig.MYSQL_PORT_3306_TCP_ADDR }}
-            - name: MYSQL_PORT_3306_TCP_PORT
-              value: {{ .Values.mysqlconfig.MYSQL_PORT_3306_TCP_PORT}}
+          - name: MYSQL_USERNAME
+            value: {{ .Values.mysqlconfig.MYSQL_USERNAME }}
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.mysqlconfig.MYSQL_PASSWORD_SECRET_NAME }}
+                key: {{ .Values.mysqlconfig.MYSQL_PASSWORD_SECRET_KEY }}
+          - name: MYSQL_INSTANCE_NAME
+            value: {{ .Values.mysqlconfig.MYSQL_INSTANCE_NAME }}
+          - name: MYSQL_PORT_3306_TCP_ADDR
+            value: {{ .Values.mysqlconfig.MYSQL_PORT_3306_TCP_ADDR }}
+          - name: MYSQL_PORT_3306_TCP_PORT
+            value: "3306"
           resources:
             limits:
               cpu: {{ .Values.resources.cpu }}

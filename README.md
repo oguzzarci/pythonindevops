@@ -923,6 +923,8 @@ Build başarılı bir şekilde çalıştı ve ECR'a pushladık.
 
 <br /><br />
 
+
+
 # Deploying MySQL on Kubernetes
 ![N|Solid](./images/mysql.png)
 
@@ -977,3 +979,79 @@ Mysql'lerimizin persistent volumleride oluşturuldu. Pod'lar kapanıp açılsa b
 
 > Kubernetes IDE olarak [LENS](https://k8slens.dev/) kullanıyorum. Yukarıdaki görüntüler lens'in dashboard'undan.
 
+<br/><br/>
+
+# ```HELM İLE İLK DEPLOY```
+
+> Başarılı bir build aldık ve mysql'lerimizi deploy ettik. Şimdi yazdığım helm chart ile dev ve prod ortamıza ilk deploy'u yapıyorum.
+```sh
+helm install pythonappdev ./pythonapphelm --set namespace=dev --set deployment.name=pythonappdev --set deployment.image.repository=********.dkr.ecr.eu-west-1.amazonaws.com --set deployment.image.name=pythonappregistry --set deployment.image.tag=12  --set mysqlconfig.MYSQL_PASSWORD_SECRET_NAME="devmysql" --set mysqlconfig.MYSQL_PORT_3306_TCP_ADDR="devmysql.dev.svc.cluster.local"
+````
+
+![N|Solid](./images/helmdev.png)
+
+![N|Solid](./images/helmdev2.png)
+
+![N|Solid](./images/helloworld.png)
+<br/><br/>
+
+```sh
+helm install pythonapprod ./pythonapphelm --set namespace=prod --set deployment.name=pythonapprod --set deployment.image.repository=********.dkr.ecr.eu-west-1.amazonaws.com --set deployment.image.name=pythonappregistry --set deployment.image.tag=12  --set mysqlconfig.MYSQL_PASSWORD_SECRET_NAME="prodmysql" --set mysqlconfig.MYSQL_PORT_3306_TCP_ADDR="prodmysql.prod.svc.cluster.local"
+````
+
+<br/>
+
+
+![N|Solid](./images/helmdev3.png)
+
+<br/><br/>
+
+## ```Release Pipeline```
+
+> Build pipelineda uygulamamızı ```BuildId``` versiyonlamıştık. Şimdi bu ```BuildId```  göre kubernetes ortamına deploy yapacağız Aşağıdaki adımları takip ederek başlayalım.
+
+1. AzureDevOps'a kubernetes service connection girilmesi.
+2. BuildId için pipeline Variable group oluşturulması.
+3. [Replace Tokens](https://marketplace.visualstudio.com/items?itemName=qetza.replacetokens) extensions yüklenmesi.
+4. Dev ve Prod Stage'lerinin kurulması.
+5. Prod ortamı için Pre-deployment approvals adımının tanımlanması. Prod ortamına bizim onayımız olmadan çıkmayacak.
+
+### ```AzureDevOps'a kubernetes service connection girilmesi.```
+> Ansible bizim için kubernetes config dosyasını local bilgisayarımıza indiriyordu. Projemizin service connections bölümünden kubernetes'i bulalım. Next diyerek devam edelim.
+
+![N|Solid](./images/k8ssc.png)
+
+> admin.conf dosyamızının içeriğini aşağıdaki gibi kopyalayıp ve Service connection name vererek kaydedelim.
+
+![N|Solid](./images/k8sscok.png)
+
+
+![N|Solid](./images/k8sscok2.png)
+
+### ```BuildId için pipeline Variable group oluşturulması.```
+> Build ve release pipeline'ı farkı olduğu için ortak bir variable group oluştuğ BuildId'sini kullanmalarını sağlıyoruz.
+
+![N|Solid](./images/vg.png)
+
+| Name | Value |
+| ------ | ------ |
+| buildId | $(Build.BuildId) |
+
+![N|Solid](./images/vg2.png)
+
+### ```Replace Tokens extensions yüklenmesi.```
+> AWS extension'nı yüklediğimiz gibi yüklüyoruz.
+
+![N|Solid](./images/rp.png)
+
+### ```Dev ve Prod Stage'lerinin kurulması```
+
+> Proje sayfasında sol sekmede bulunan Pipelines Release kısmından Create Pipeline diyerek yeni bir pipeline oluşturuyoruz. Empty job diyerek devam ediyoruz.
+
+![N|Solid](./images/newpipeline.png)
+
+> Sol tarafta bulunan ```Artifacts``` hem build pipeli'nı hemde Helm chart'm repoda olduğu için kodlarımızın oldu repoyu ekliyorum.
+
+![N|Solid](./images/newpipeline2.png)
+
+![N|Solid](./images/newpipeline3.png)

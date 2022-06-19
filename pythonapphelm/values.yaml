@@ -1,14 +1,14 @@
 namespacecreate: "false"
-namespace: ""
+namespace: "empty"
 replicas: 1
 deployment:
-  name: ""
+  name: "empty"
   image:
-    repository: ""
-    name: ""
-    tag: ""
+    repository: "empty"
+    name: "empty"
+    tag: "empty"
 hpa:
-  min: 4
+  min: 1
   max: 50
   averageUtilization: 50
 service:
@@ -17,15 +17,16 @@ service:
 containers:
   port: 3000
 resources:
-  cpu: 100m
-  memory: 125m
+  cpu: "100m"
+  memory: "100Mi"
 ingress:
   class: nginx
-  domain: dev.teknodice.com
+  domain: "dev.teknodice.com"
   active: false
 mysqlconfig:
-  MYSQL_USERNAME: root
-  MYSQL_PASSWORD_SECRET_KEY: mysql-root-password
-  MYSQL_INSTANCE_NAME: my_database
-  MYSQL_PORT_3306_TCP_ADDR: mysql.default.svc.cluster.local
+  MYSQL_USERNAME: "root"
+  MYSQL_PASSWORD_SECRET_NAME: "devmysql"
+  MYSQL_PASSWORD_SECRET_KEY: "mysql-root-password"
+  MYSQL_INSTANCE_NAME: "my_database"
+  MYSQL_PORT_3306_TCP_ADDR: "mysqldev.dev.svc.cluster.local"
   MYSQL_PORT_3306_TCP_PORT: 3306
