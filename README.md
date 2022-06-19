@@ -40,7 +40,10 @@ git clone https://github.com/oguzzarci/pythonindevops.git
 cd pythonindevops
 # INFRA
 sh infrasetup.sh
+# Note: ansible klasörünün altında oluşan admin.cof dosyasını $HOME/.kube/ altında config olarak atmalısınız.
+# !!! config dosyasınızın yedeğini almayı unutmayın !!!
 # MYSQL
+# Note: Certificate hatası alıyorsanız bknz: https://github.com/oguzzarci/pythonindevops/blob/master/9-ReleasePipeline.md
 sh allmysqlinstall.sh
 ```
 
@@ -51,6 +54,8 @@ sh allmysqlinstall.sh
 sh destroy.sh
 ```
 <br/>
+
+# Altyapı diyagramı ve CI/CD Yapısı
 
 ![N|Solid](./images/pythonapp.drawio.png)
 
