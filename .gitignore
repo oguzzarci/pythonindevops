@@ -8,3 +8,4 @@
 inventory
 admin.conf
 config
+*.pyc
