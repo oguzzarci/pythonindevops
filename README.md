@@ -1055,3 +1055,59 @@ helm install pythonapprod ./pythonapphelm --set namespace=prod --set deployment.
 ![N|Solid](./images/newpipeline2.png)
 
 ![N|Solid](./images/newpipeline3.png)
+
+>Oluşturduğumuz Variable Group'u ekliyoruz.
+
+![N|Solid](./images/vb2.png)
+
+> Hem başarılı build alındığında Release Pipeli tetiklenmesini istiyorsak aşağıdaki trigger'ı açmamız gerekiyor
+
+![N|Solid](./images/releasetrigger.png)
+
+> Pipeline aşağıdaki gibi;
+
+![N|Solid](./images/release.png)
+![N|Solid](./images/release2.png)
+![N|Solid](./images/release2.png)
+
+
+<br/><br/>
+#### Yeni bir build başlattım. Build başarılı bir şekilde tamamlanırsa Release pipeline tetiklenerek dev ortamına yeni versiyonu deploy edecek.
+<br/>
+
+```Build Başarılı```
+![N|Solid](./images/build.png)
+
+<br/><br/>
+
+```Deploy Başarılı```
+![N|Solid](./images/deploy.png)
+
+<br/><br/>
+
+```Yeni Versiyon```
+![N|Solid](./images/newversion.png)
+
+>Prod Stage'i kurmak için Dev Stage'i clone diyerek kurabiliriz. Stage adını ve chart ismini güncellememiz gerekiyor.
+
+![N|Solid](./images/release4.png)
+
+![N|Solid](./images/release5.png)
+
+<br/><br/>
+
+### ```Prod ortamı için Pre-deployment approvals adımının tanımlanması```
+
+![N|Solid](./images/release6.png)
+
+![N|Solid](./images/release7.png)
+
+Artık Prod ortamına deploy çıkarken benim onayım alınacak.
+
+![N|Solid](./images/release8.png)
+
+> Böyle bir durumda microsof size mail'de atıyor.
+
+![N|Solid](./images/release9.png)
+
+![N|Solid](./images/release10.png)
