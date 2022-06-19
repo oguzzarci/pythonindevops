@@ -1,1 +1,320 @@
-{"options":[{"enabled":false,"definition":{"id":"5d58cc01-7c75-450c-be18-a388ddb129ec"},"inputs":{"branchFilters":"[\"+refs/heads/*\"]","additionalFields":"{}"}},{"enabled":false,"definition":{"id":"a9db38f9-9fdc-478c-b0f9-464221e58316"},"inputs":{"workItemType":"Bug","assignToRequestor":"true","additionalFields":"{}"}}],"variables":{"SONAR_TOKEN":{"value":"0bc2c6d236e09b71adc427ad28938fdffc60e850"},"system.debug":{"value":"false","allowOverride":true}},"properties":{},"tags":[],"_links":{"self":{"href":"https://dev.azure.com/oguzzarci/aba5752d-eb3b-42f9-9b3b-76d7d073ccaf/_apis/build/Definitions/5?revision=20"},"web":{"href":"https://dev.azure.com/oguzzarci/aba5752d-eb3b-42f9-9b3b-76d7d073ccaf/_build/definition?definitionId=5"},"editor":{"href":"https://dev.azure.com/oguzzarci/aba5752d-eb3b-42f9-9b3b-76d7d073ccaf/_build/designer?id=5&_a=edit-build-definition"},"badge":{"href":"https://dev.azure.com/oguzzarci/aba5752d-eb3b-42f9-9b3b-76d7d073ccaf/_apis/build/status/5"}},"jobAuthorizationScope":1,"jobTimeoutInMinutes":60,"jobCancelTimeoutInMinutes":5,"process":{"phases":[{"steps":[{"environment":{},"enabled":true,"continueOnError":true,"alwaysRun":false,"displayName":"Pylint","timeoutInMinutes":0,"retryCountOnTaskFailure":0,"condition":"succeeded()","task":{"id":"6c731c3c-3c68-459a-a5c9-bde6e6595b5b","versionSpec":"3.*","definitionType":"task"},"inputs":{"targetType":"inline","filePath":"","arguments":"","script":"sudo apt install pylint\npylint ./app/app.py\n\n","workingDirectory":"","failOnStderr":"false","bashEnvValue":""}},{"environment":{},"enabled":true,"continueOnError":false,"alwaysRun":false,"displayName":"Mock Testing","timeoutInMinutes":0,"retryCountOnTaskFailure":0,"condition":"succeeded()","task":{"id":"6c731c3c-3c68-459a-a5c9-bde6e6595b5b","versionSpec":"3.*","definitionType":"task"},"inputs":{"targetType":"inline","filePath":"","arguments":"","script":"pip install flask\npip install pytest\npy.test ./app","workingDirectory":"","failOnStderr":"false","bashEnvValue":""}},{"environment":{},"enabled":true,"continueOnError":false,"alwaysRun":false,"displayName":"build","timeoutInMinutes":0,"retryCountOnTaskFailure":0,"condition":"succeeded()","task":{"id":"e28912f1-0114-4464-802a-a3a35437fd16","versionSpec":"2.*","definitionType":"task"},"inputs":{"containerRegistry":"","repository":"","command":"build","Dockerfile":"app/Dockerfile","buildContext":"**","tags":"","arguments":"-t pythonapp:$(Build.BuildId)","addPipelineData":"true","addBaseImageData":"true","container":""}},{"environment":{},"enabled":true,"continueOnError":false,"alwaysRun":false,"displayName":"Trivy Download & ImageScan","timeoutInMinutes":0,"retryCountOnTaskFailure":0,"condition":"succeeded()","task":{"id":"6c731c3c-3c68-459a-a5c9-bde6e6595b5b","versionSpec":"3.*","definitionType":"task"},"inputs":{"targetType":"inline","filePath":"","arguments":"","script":"sudo apt-get install wget apt-transport-https gnupg lsb-release\nwget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -\necho deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list\nsudo apt-get update\nsudo apt-get install trivy\n\ntrivy image pythonapp:$(Build.BuildId)","workingDirectory":"","failOnStderr":"false","bashEnvValue":""}},{"environment":{},"enabled":true,"continueOnError":false,"alwaysRun":false,"displayName":"Push Image: ","timeoutInMinutes":0,"retryCountOnTaskFailure":0,"condition":"succeeded()","task":{"id":"467d1870-1a00-4755-b00d-9642129fe759","versionSpec":"1.*","definitionType":"task"},"inputs":{"awsCredentials":"066c0b1c-6190-41d5-abe0-69320609540f","regionName":"eu-west-1","imageSource":"imagename","sourceImageName":"pythonapp","sourceImageTag":"$(Build.BuildId)","sourceImageId":"","repositoryName":"pythonappregistry","pushTag":"$(Build.BuildId)","autoCreateRepository":"false","forceDockerNamingConventions":"false","outputVariable":"","logRequest":"false","logResponse":"false"}},{"environment":{},"enabled":true,"continueOnError":false,"alwaysRun":false,"displayName":"Sonar Download and Scan","timeoutInMinutes":0,"retryCountOnTaskFailure":0,"condition":"succeeded()","task":{"id":"6c731c3c-3c68-459a-a5c9-bde6e6595b5b","versionSpec":"3.*","definitionType":"task"},"inputs":{"targetType":"inline","filePath":"","arguments":"","script":"export SONAR_SCANNER_VERSION=4.7.0.2747\nexport SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux\ncurl --create-dirs -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip\nunzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/\nexport PATH=$SONAR_SCANNER_HOME/bin:$PATH\nexport SONAR_SCANNER_OPTS=\"-server\"\nexport SONAR_TOKEN=\"0bc2c6d236e09b71adc427ad28938fdffc60e850\"\n\n\nsonar-scanner \\\n  -Dsonar.organization=oguzzarcisonarcloud \\\n  -Dsonar.projectKey=pythonapp \\\n  -Dsonar.sources=. \\\n  -Dsonar.host.url=https://sonarcloud.io","workingDirectory":"","failOnStderr":"false","bashEnvValue":""}}],"name":"Agent job 1","refName":"Job_1","condition":"succeeded()","target":{"executionOptions":{"type":0},"allowScriptsAuthAccessOption":false,"type":1},"jobAuthorizationScope":1}],"target":{"agentSpecification":{"identifier":"ubuntu-20.04"}},"type":1},"repository":{"properties":{"apiUrl":"https://api.github.com/repos/oguzzarci/pythonindevops","branchesUrl":"https://api.github.com/repos/oguzzarci/pythonindevops/branches","cloneUrl":"https://github.com/oguzzarci/pythonindevops.git","connectedServiceId":"dc0a7b93-efee-4f72-8b3e-2146a6d02168","defaultBranch":"master","fullName":"oguzzarci/pythonindevops","hasAdminPermissions":"True","isFork":"False","isPrivate":"False","lastUpdated":"06/15/2022 15:36:15","manageUrl":"https://github.com/oguzzarci/pythonindevops","nodeId":"R_kgDOHfnxYA","ownerId":"11678244","orgName":"oguzzarci","refsUrl":"https://api.github.com/repos/oguzzarci/pythonindevops/git/refs","safeRepository":"oguzzarci/pythonindevops","shortName":"pythonindevops","ownerAvatarUrl":"https://avatars.githubusercontent.com/u/11678244?v=4","archived":"False","externalId":"502919520","ownerIsAUser":"True","checkoutNestedSubmodules":"false","cleanOptions":"0","fetchDepth":"0","gitLfsSupport":"false","reportBuildStatus":"true","skipSyncSource":"false","labelSourcesFormat":"$(build.buildNumber)","labelSources":"0"},"id":"oguzzarci/pythonindevops","type":"GitHub","name":"oguzzarci/pythonindevops","url":"https://github.com/oguzzarci/pythonindevops.git","defaultBranch":"refs/heads/master","clean":"true","checkoutSubmodules":false},"processParameters":{},"quality":1,"authoredBy":{"displayName":"Oğuz Zarcı","url":"https://spsprodweu1.vssps.visualstudio.com/Af8d1c4ac-1556-426e-8faf-ec54216c2062/_apis/Identities/18a16d6a-1098-4709-b106-fa086fd67ca6","_links":{"avatar":{"href":"https://dev.azure.com/oguzzarci/_apis/GraphProfile/MemberAvatars/msa.MjgwMjFkN2ItODFlMC03ZjAzLWIwMjYtNDViYWQwZGY3NTgz"}},"id":"18a16d6a-1098-4709-b106-fa086fd67ca6","uniqueName":"oguzzarci@hotmail.com","imageUrl":"https://dev.azure.com/oguzzarci/_apis/GraphProfile/MemberAvatars/msa.MjgwMjFkN2ItODFlMC03ZjAzLWIwMjYtNDViYWQwZGY3NTgz","descriptor":"msa.MjgwMjFkN2ItODFlMC03ZjAzLWIwMjYtNDViYWQwZGY3NTgz"},"drafts":[],"queue":{"_links":{"self":{"href":"https://dev.azure.com/oguzzarci/_apis/build/Queues/45"}},"id":45,"name":"Azure Pipelines","url":"https://dev.azure.com/oguzzarci/_apis/build/Queues/45","pool":{"id":10,"name":"Azure Pipelines","isHosted":true}},"id":5,"name":"PythonApp-CI","url":"https://dev.azure.com/oguzzarci/aba5752d-eb3b-42f9-9b3b-76d7d073ccaf/_apis/build/Definitions/5?revision=20","uri":"vstfs:///Build/Definition/5","path":"\\","type":2,"queueStatus":0,"revision":20,"createdDate":"2022-06-19T22:46:37.003Z","project":{"id":"aba5752d-eb3b-42f9-9b3b-76d7d073ccaf","name":"PythonApp","url":"https://dev.azure.com/oguzzarci/_apis/projects/aba5752d-eb3b-42f9-9b3b-76d7d073ccaf","state":1,"revision":50,"visibility":0,"lastUpdateTime":"2022-06-17T11:17:35.047Z"}}
+{
+    "options": [
+      {
+        "enabled": false,
+        "definition": {
+          "id": "5d58cc01-7c75-450c-be18-a388ddb129ec"
+        },
+        "inputs": {
+          "branchFilters": "[\"+refs/heads/*\"]",
+          "additionalFields": "{}"
+        }
+      },
+      {
+        "enabled": false,
+        "definition": {
+          "id": "a9db38f9-9fdc-478c-b0f9-464221e58316"
+        },
+        "inputs": {
+          "workItemType": "Bug",
+          "assignToRequestor": "true",
+          "additionalFields": "{}"
+        }
+      }
+    ],
+    "variables": {
+      "SONAR_TOKEN": {
+        "value": "0bc2c6d236e09b71adc427ad28938fdffc60e850"
+      },
+      "system.debug": {
+        "value": "false",
+        "allowOverride": true
+      }
+    },
+    "properties": {},
+    "tags": [],
+    "_links": {
+      "self": {
+        "href": "https://dev.azure.com/oguzzarci/aba5752d-eb3b-42f9-9b3b-76d7d073ccaf/_apis/build/Definitions/5?revision=20"
+      },
+      "web": {
+        "href": "https://dev.azure.com/oguzzarci/aba5752d-eb3b-42f9-9b3b-76d7d073ccaf/_build/definition?definitionId=5"
+      },
+      "editor": {
+        "href": "https://dev.azure.com/oguzzarci/aba5752d-eb3b-42f9-9b3b-76d7d073ccaf/_build/designer?id=5&_a=edit-build-definition"
+      },
+      "badge": {
+        "href": "https://dev.azure.com/oguzzarci/aba5752d-eb3b-42f9-9b3b-76d7d073ccaf/_apis/build/status/5"
+      }
+    },
+    "jobAuthorizationScope": 1,
+    "jobTimeoutInMinutes": 60,
+    "jobCancelTimeoutInMinutes": 5,
+    "process": {
+      "phases": [
+        {
+          "steps": [
+            {
+              "environment": {},
+              "enabled": true,
+              "continueOnError": true,
+              "alwaysRun": false,
+              "displayName": "Pylint",
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "condition": "succeeded()",
+              "task": {
+                "id": "6c731c3c-3c68-459a-a5c9-bde6e6595b5b",
+                "versionSpec": "3.*",
+                "definitionType": "task"
+              },
+              "inputs": {
+                "targetType": "inline",
+                "filePath": "",
+                "arguments": "",
+                "script": "sudo apt install pylint\npylint ./app/app.py\n\n",
+                "workingDirectory": "",
+                "failOnStderr": "false",
+                "bashEnvValue": ""
+              }
+            },
+            {
+              "environment": {},
+              "enabled": true,
+              "continueOnError": false,
+              "alwaysRun": false,
+              "displayName": "Mock Testing",
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "condition": "succeeded()",
+              "task": {
+                "id": "6c731c3c-3c68-459a-a5c9-bde6e6595b5b",
+                "versionSpec": "3.*",
+                "definitionType": "task"
+              },
+              "inputs": {
+                "targetType": "inline",
+                "filePath": "",
+                "arguments": "",
+                "script": "pip install flask\npip install pytest\npy.test ./app",
+                "workingDirectory": "",
+                "failOnStderr": "false",
+                "bashEnvValue": ""
+              }
+            },
+            {
+              "environment": {},
+              "enabled": true,
+              "continueOnError": false,
+              "alwaysRun": false,
+              "displayName": "build",
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "condition": "succeeded()",
+              "task": {
+                "id": "e28912f1-0114-4464-802a-a3a35437fd16",
+                "versionSpec": "2.*",
+                "definitionType": "task"
+              },
+              "inputs": {
+                "containerRegistry": "",
+                "repository": "",
+                "command": "build",
+                "Dockerfile": "app/Dockerfile",
+                "buildContext": "**",
+                "tags": "",
+                "arguments": "-t pythonapp:$(Build.BuildId)",
+                "addPipelineData": "true",
+                "addBaseImageData": "true",
+                "container": ""
+              }
+            },
+            {
+              "environment": {},
+              "enabled": true,
+              "continueOnError": false,
+              "alwaysRun": false,
+              "displayName": "Trivy Download & ImageScan",
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "condition": "succeeded()",
+              "task": {
+                "id": "6c731c3c-3c68-459a-a5c9-bde6e6595b5b",
+                "versionSpec": "3.*",
+                "definitionType": "task"
+              },
+              "inputs": {
+                "targetType": "inline",
+                "filePath": "",
+                "arguments": "",
+                "script": "sudo apt-get install wget apt-transport-https gnupg lsb-release\nwget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -\necho deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list\nsudo apt-get update\nsudo apt-get install trivy\n\ntrivy image pythonapp:$(Build.BuildId)",
+                "workingDirectory": "",
+                "failOnStderr": "false",
+                "bashEnvValue": ""
+              }
+            },
+            {
+              "environment": {},
+              "enabled": true,
+              "continueOnError": false,
+              "alwaysRun": false,
+              "displayName": "Push Image: ",
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "condition": "succeeded()",
+              "task": {
+                "id": "467d1870-1a00-4755-b00d-9642129fe759",
+                "versionSpec": "1.*",
+                "definitionType": "task"
+              },
+              "inputs": {
+                "awsCredentials": "066c0b1c-6190-41d5-abe0-69320609540f",
+                "regionName": "eu-west-1",
+                "imageSource": "imagename",
+                "sourceImageName": "pythonapp",
+                "sourceImageTag": "$(Build.BuildId)",
+                "sourceImageId": "",
+                "repositoryName": "pythonappregistry",
+                "pushTag": "$(Build.BuildId)",
+                "autoCreateRepository": "false",
+                "forceDockerNamingConventions": "false",
+                "outputVariable": "",
+                "logRequest": "false",
+                "logResponse": "false"
+              }
+            },
+            {
+              "environment": {},
+              "enabled": true,
+              "continueOnError": false,
+              "alwaysRun": false,
+              "displayName": "Sonar Download and Scan",
+              "timeoutInMinutes": 0,
+              "retryCountOnTaskFailure": 0,
+              "condition": "succeeded()",
+              "task": {
+                "id": "6c731c3c-3c68-459a-a5c9-bde6e6595b5b",
+                "versionSpec": "3.*",
+                "definitionType": "task"
+              },
+              "inputs": {
+                "targetType": "inline",
+                "filePath": "",
+                "arguments": "",
+                "script": "export SONAR_SCANNER_VERSION=4.7.0.2747\nexport SONAR_SCANNER_HOME=$HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux\ncurl --create-dirs -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip\nunzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/\nexport PATH=$SONAR_SCANNER_HOME/bin:$PATH\nexport SONAR_SCANNER_OPTS=\"-server\"\nexport SONAR_TOKEN=\"0bc2c6d236e09b71adc427ad28938fdffc60e850\"\n\n\nsonar-scanner \\\n  -Dsonar.organization=oguzzarcisonarcloud \\\n  -Dsonar.projectKey=pythonapp \\\n  -Dsonar.sources=. \\\n  -Dsonar.host.url=https://sonarcloud.io",
+                "workingDirectory": "",
+                "failOnStderr": "false",
+                "bashEnvValue": ""
+              }
+            }
+          ],
+          "name": "Agent job 1",
+          "refName": "Job_1",
+          "condition": "succeeded()",
+          "target": {
+            "executionOptions": {
+              "type": 0
+            },
+            "allowScriptsAuthAccessOption": false,
+            "type": 1
+          },
+          "jobAuthorizationScope": 1
+        }
+      ],
+      "target": {
+        "agentSpecification": {
+          "identifier": "ubuntu-20.04"
+        }
+      },
+      "type": 1
+    },
+    "repository": {
+      "properties": {
+        "apiUrl": "https://api.github.com/repos/oguzzarci/pythonindevops",
+        "branchesUrl": "https://api.github.com/repos/oguzzarci/pythonindevops/branches",
+        "cloneUrl": "https://github.com/oguzzarci/pythonindevops.git",
+        "connectedServiceId": "dc0a7b93-efee-4f72-8b3e-2146a6d02168",
+        "defaultBranch": "master",
+        "fullName": "oguzzarci/pythonindevops",
+        "hasAdminPermissions": "True",
+        "isFork": "False",
+        "isPrivate": "False",
+        "lastUpdated": "06/15/2022 15:36:15",
+        "manageUrl": "https://github.com/oguzzarci/pythonindevops",
+        "nodeId": "R_kgDOHfnxYA",
+        "ownerId": "11678244",
+        "orgName": "oguzzarci",
+        "refsUrl": "https://api.github.com/repos/oguzzarci/pythonindevops/git/refs",
+        "safeRepository": "oguzzarci/pythonindevops",
+        "shortName": "pythonindevops",
+        "ownerAvatarUrl": "https://avatars.githubusercontent.com/u/11678244?v=4",
+        "archived": "False",
+        "externalId": "502919520",
+        "ownerIsAUser": "True",
+        "checkoutNestedSubmodules": "false",
+        "cleanOptions": "0",
+        "fetchDepth": "0",
+        "gitLfsSupport": "false",
+        "reportBuildStatus": "true",
+        "skipSyncSource": "false",
+        "labelSourcesFormat": "$(build.buildNumber)",
+        "labelSources": "0"
+      },
+      "id": "oguzzarci/pythonindevops",
+      "type": "GitHub",
+      "name": "oguzzarci/pythonindevops",
+      "url": "https://github.com/oguzzarci/pythonindevops.git",
+      "defaultBranch": "refs/heads/master",
+      "clean": "true",
+      "checkoutSubmodules": false
+    },
+    "processParameters": {},
+    "quality": 1,
+    "authoredBy": {
+      "displayName": "Oğuz Zarcı",
+      "url": "https://spsprodweu1.vssps.visualstudio.com/Af8d1c4ac-1556-426e-8faf-ec54216c2062/_apis/Identities/18a16d6a-1098-4709-b106-fa086fd67ca6",
+      "_links": {
+        "avatar": {
+          "href": "https://dev.azure.com/oguzzarci/_apis/GraphProfile/MemberAvatars/msa.MjgwMjFkN2ItODFlMC03ZjAzLWIwMjYtNDViYWQwZGY3NTgz"
+        }
+      },
+      "id": "18a16d6a-1098-4709-b106-fa086fd67ca6",
+      "uniqueName": "oguzzarci@hotmail.com",
+      "imageUrl": "https://dev.azure.com/oguzzarci/_apis/GraphProfile/MemberAvatars/msa.MjgwMjFkN2ItODFlMC03ZjAzLWIwMjYtNDViYWQwZGY3NTgz",
+      "descriptor": "msa.MjgwMjFkN2ItODFlMC03ZjAzLWIwMjYtNDViYWQwZGY3NTgz"
+    },
+    "drafts": [],
+    "queue": {
+      "_links": {
+        "self": {
+          "href": "https://dev.azure.com/oguzzarci/_apis/build/Queues/45"
+        }
+      },
+      "id": 45,
+      "name": "Azure Pipelines",
+      "url": "https://dev.azure.com/oguzzarci/_apis/build/Queues/45",
+      "pool": {
+        "id": 10,
+        "name": "Azure Pipelines",
+        "isHosted": true
+      }
+    },
+    "id": 5,
+    "name": "PythonApp-CI",
+    "url": "https://dev.azure.com/oguzzarci/aba5752d-eb3b-42f9-9b3b-76d7d073ccaf/_apis/build/Definitions/5?revision=20",
+    "uri": "vstfs:///Build/Definition/5",
+    "path": "\\",
+    "type": 2,
+    "queueStatus": 0,
+    "revision": 20,
+    "createdDate": "2022-06-19T22:46:37.003Z",
+    "project": {
+      "id": "aba5752d-eb3b-42f9-9b3b-76d7d073ccaf",
+      "name": "PythonApp",
+      "url": "https://dev.azure.com/oguzzarci/_apis/projects/aba5752d-eb3b-42f9-9b3b-76d7d073ccaf",
+      "state": 1,
+      "revision": 50,
+      "visibility": 0,
+      "lastUpdateTime": "2022-06-17T11:17:35.047Z"
+    }
+  }

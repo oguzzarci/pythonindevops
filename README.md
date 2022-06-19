@@ -15,7 +15,7 @@
 
 
 ---
-## ALL Contents
+## Tüm içerikler
 
 1. [Python Uygulamasının Dockerize Edilmesi](https://github.com/oguzzarci/pythonindevops/blob/master/1-DockerizeApp.md)
 2. [Terraform](https://github.com/oguzzarci/pythonindevops/blob/master/2-Terraform.md)
@@ -36,12 +36,19 @@
 # Hızlı Kurulum
 >Kubernetes ortamının ve mysqllerin kurulması için aşağıdaki komutları çalıştabilirsiniz.
 ```sh
-https://github.com/oguzzarci/pythonindevops.git
+git clone https://github.com/oguzzarci/pythonindevops.git
 cd pythonindevops
 # INFRA
 sh infrasetup.sh
 # MYSQL
 sh allmysqlinstall.sh
+```
+
+# Filmlerdeki Kırmızı Buton :)
+>Kurduğumuz herşeyi aşağıdaki komutla silebiliriz.
+```sh
+#DESTROY
+sh destroy.sh
 ```
 <br/>
 
@@ -49,7 +56,7 @@ sh allmysqlinstall.sh
 
 ---
 
-## Recommended Reading
+## Önerilen Kaynaklar
 
 - <https://aquasecurity.github.io/trivy/v0.29.0/>
 - <https://docs.pytest.org/en/7.1.x/>
