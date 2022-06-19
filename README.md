@@ -43,8 +43,8 @@ sh infrasetup.sh
 # Note: ansible klasörünün altında oluşan admin.cof dosyasını $HOME/.kube/ altında config olarak atmalısınız.
 # !!! config dosyasınızın yedeğini almayı unutmayın !!!
 # MYSQL
-# Note: Certificate hatası alıyorsanız bknz: https://github.com/oguzzarci/pythonindevops/blob/master/9-ReleasePipeline.md
 sh allmysqlinstall.sh
+# Note: Certificate hatası alıyorsanız bknz: https://github.com/oguzzarci/pythonindevops/blob/master/9-ReleasePipeline.md
 ```
 
 # Filmlerdeki Kırmızı Buton :)
