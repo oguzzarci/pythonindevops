@@ -81,6 +81,18 @@
        chdir: $HOME
        creates: csi.log
 
+   - name: Create Dev NameSpace
+     shell: kubectl create ns dev >> nsdev.log
+     args:
+       chdir: $HOME
+       creates: nsdev.log
+
+   - name: Create Prod NameSpace
+     shell: kubectl create ns prod >> nsprod.log
+     args:
+       chdir: $HOME
+       creates: nsprod.log
+
    - name: Create token to join cluster
      shell: kubeadm token create --print-join-command
      register: join_command_raw
