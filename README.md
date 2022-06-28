@@ -66,5 +66,5 @@ sh destroy.sh
 - <https://aquasecurity.github.io/trivy/v0.29.0/>
 - <https://docs.pytest.org/en/7.1.x/>
 - <https://pypi.org/project/pylint/>
-- <https://bitnami.com/stack/mysql/helmget-started-with-kubernetes-using-python/>
+- <https://bitnami.com/stack/mysql/helm>
 - <https://k8slens.dev/>
