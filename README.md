@@ -24,7 +24,7 @@
 5. [Aws Storage Class](https://github.com/oguzzarci/pythonindevops/blob/master/5-AwsStorageClass.md)
 6. [AZURE DEVOPS İLE CI/CD | Build Pipeline](https://github.com/oguzzarci/pythonindevops/blob/master/6-BuildPipeline.md)
 7. [Deploying MySQL on Kubernetes](https://github.com/oguzzarci/pythonindevops/blob/master/7-DeployMysql.md)
-8. [Helm İle İlk Deploy | Helm Chart](https://github.com/oguzzarci/pythonindevops/blob/master/7-DeployMysql.md)
+8. [Helm İle İlk Deploy | Helm Chart](https://github.com/oguzzarci/pythonindevops/blob/master/8-Helm.md)
 9. [AZURE DEVOPS İLE CI/CD | Release Pipeline](https://github.com/oguzzarci/pythonindevops/blob/master/9-ReleasePipeline.md)
 10. [Build Pipeline Testing | Pylint](https://github.com/oguzzarci/pythonindevops/blob/master/10-Pylint.md)
 11. [Build Pipeline Testing | PyTEST](https://github.com/oguzzarci/pythonindevops/blob/master/11-Pytest.md)
